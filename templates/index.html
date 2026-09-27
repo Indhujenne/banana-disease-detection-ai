@@ -22,7 +22,7 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -102,6 +102,16 @@
             margin-top: 20px;
             font-weight: bold;
         }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #2e7d32;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -113,7 +123,6 @@
 
     <form id="predictionForm">
 
-        <!-- Disease Selection -->
         <label for="disease">Select Disease:</label>
 
         <select id="disease" name="disease">
@@ -141,7 +150,6 @@
         </select>
 
 
-        <!-- Language -->
         <label for="language">Select Language:</label>
 
         <select id="language" name="language">
@@ -157,8 +165,9 @@
         </select>
 
 
-        <!-- Image Upload -->
-        <label for="images">Upload Banana Leaf Image:</label>
+        <label for="images">
+            Upload Banana Leaf Image:
+        </label>
 
         <input
             type="file"
@@ -170,7 +179,6 @@
         >
 
 
-        <!-- Predict -->
         <button type="submit">
             🔍 Predict Disease
         </button>
@@ -183,8 +191,6 @@
     <div id="results"></div>
 
 
-    <!-- Previous Predictions -->
-
     <div class="previous">
 
         <h2>Previous Predictions</h2>
@@ -195,7 +201,10 @@
 
             <div class="previous-card">
 
-                <img src="/{{ item.image }}" alt="Banana Leaf">
+                <img
+                    src="{{ url_for('static', filename=item.image) }}"
+                    alt="Banana Leaf"
+                >
 
                 <p>
                     <strong>Disease:</strong>
@@ -252,7 +261,8 @@ form.addEventListener("submit", async function(event) {
 
     resultsDiv.innerHTML = "";
 
-    loadingDiv.innerHTML = "🔄 Predicting... Please wait.";
+    loadingDiv.innerHTML =
+        "🔄 Predicting... Please wait.";
 
 
     const formData = new FormData(form);
@@ -275,13 +285,23 @@ form.addEventListener("submit", async function(event) {
         loadingDiv.innerHTML = "";
 
 
+        if (!response.ok) {
+
+            resultsDiv.innerHTML =
+                `<p class="error">
+                    ${data.error || "Prediction failed."}
+                </p>`;
+
+            return;
+        }
+
+
         if (!data.results || data.results.length === 0) {
 
             resultsDiv.innerHTML =
-                "<p>No prediction result found.</p>";
+                "<p class='error'>No prediction result found.</p>";
 
             return;
-
         }
 
 
@@ -294,9 +314,12 @@ form.addEventListener("submit", async function(event) {
 
             card.innerHTML = `
 
-                <h2>Prediction Result</h2>
+                <h2>✅ Prediction Result</h2>
 
-                <img src="/${result.image}" alt="Banana Leaf">
+                <img
+                    src="/static/${result.image}"
+                    alt="Banana Leaf"
+                >
 
                 <p>
                     <strong>Predicted Disease:</strong>
@@ -310,12 +333,12 @@ form.addEventListener("submit", async function(event) {
 
                 <p>
                     <strong>Advice:</strong>
-                    ${result.advice.join(", ")}
+                    ${result.advice}
                 </p>
 
                 <p>
                     <strong>Fertilizer:</strong>
-                    ${result.fertilizer.join(", ")}
+                    ${result.fertilizer}
                 </p>
 
             `;
@@ -325,6 +348,10 @@ form.addEventListener("submit", async function(event) {
 
         });
 
+
+        loadingDiv.innerHTML =
+            "<span class='success'>✅ Prediction completed successfully.</span>";
+
     }
 
     catch (error) {
@@ -332,9 +359,9 @@ form.addEventListener("submit", async function(event) {
         loadingDiv.innerHTML = "";
 
         resultsDiv.innerHTML =
-            "<p style='color:red;'>Error while predicting. Please try again.</p>";
+            "<p class='error'>Error while predicting. Please try again.</p>";
 
-        console.error(error);
+        console.error("Prediction error:", error);
 
     }
 
