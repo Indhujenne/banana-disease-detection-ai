@@ -1,0 +1,62 @@
+[
+    {
+        "image": "static\\Augmented Banana Healthy Leaf (1).jpg",
+        "disease": "black_sigatoka",
+        "confidence": 42.81,
+        "advice_en": [
+            "Remove infected leaves",
+            "Apply fungicide"
+        ],
+        "advice_te": [
+            "\u0c2b\u0c02\u0c17\u0c3f\u0c38\u0c48\u0c21\u0c4d \u0c35\u0c3e\u0c21\u0c02\u0c21\u0c3f",
+            "\u0c17\u0c3e\u0c32\u0c3f \u0c2a\u0c4d\u0c30\u0c38\u0c30\u0c23 \u0c2e\u0c46\u0c30\u0c41\u0c17\u0c41\u0c2a\u0c30\u0c1a\u0c02\u0c21\u0c3f"
+        ],
+        "advice_hi": [
+            "\u092b\u092b\u0942\u0902\u0926\u0928\u093e\u0936\u0915 \u0909\u092a\u092f\u094b\u0917 \u0915\u0930\u0947\u0902",
+            "\u0939\u0935\u093e \u0915\u093e \u092a\u094d\u0930\u0935\u093e\u0939 \u092c\u0922\u093c\u093e\u090f\u0902"
+        ],
+        "fertilizer": [
+            "Mancozeb",
+            "Potassium fertilizer"
+        ]
+    },
+    {
+        "image": "static\\Augmented_Banana_Yellow_Sigatoka_Disease_1.jpg",
+        "disease": "Yellow_Sigatoka",
+        "confidence": 76.05,
+        "advice": [
+            "Use resistant variety",
+            "Prune affected leaves"
+        ],
+        "fertilizer": [
+            "Zinc Sulfate",
+            "Potash"
+        ]
+    },
+    {
+        "image": "static\\Augmented_Banana_Yellow_Sigatoka_Disease_2.jpg",
+        "disease": "Yellow_Sigatoka",
+        "confidence": 76.58,
+        "advice": [
+            "Use resistant variety",
+            "Prune affected leaves"
+        ],
+        "fertilizer": [
+            "Zinc Sulfate",
+            "Potash"
+        ]
+    },
+    {
+        "image": "static\\Augmented_Banana_Yellow_Sigatoka_Disease_3.jpg",
+        "disease": "Yellow_Sigatoka",
+        "confidence": 70.8,
+        "advice": [
+            "Prune affected leaves",
+            "Use resistant variety"
+        ],
+        "fertilizer": [
+            "Zinc Sulfate",
+            "Potash"
+        ]
+    }
+]

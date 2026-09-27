@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Banana Disease Predictor</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #2e7d32;
+            color: white;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1b5e20;
+        }
+
+        #results {
+            margin-top: 30px;
+        }
+
+        .result-card {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f1f8e9;
+            border: 1px solid #c5e1a5;
+        }
+
+        .result-card h2 {
+            margin-top: 0;
+        }
+
+        .previous {
+            margin-top: 40px;
+        }
+
+        .previous-card {
+            padding: 15px;
+            margin-top: 15px;
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        img {
+            max-width: 250px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🍌 Banana Disease Predictor</h1>
+
+    <form id="predictionForm">
+
+        <!-- Disease Selection -->
+        <label for="disease">Select Disease:</label>
+
+        <select id="disease" name="disease">
+
+            <option value="black_sigatoka">
+                Black Sigatoka Disease
+            </option>
+
+            <option value="healthy">
+                Healthy Leaf
+            </option>
+
+            <option value="moko_disease">
+                Moko Disease
+            </option>
+
+            <option value="panama_disease">
+                Panama Disease
+            </option>
+
+            <option value="yellow_sigatoka">
+                Yellow Sigatoka Disease
+            </option>
+
+        </select>
+
+
+        <!-- Language -->
+        <label for="language">Select Language:</label>
+
+        <select id="language" name="language">
+
+            <option value="English">English</option>
+
+            <option value="Telugu">Telugu</option>
+
+            <option value="Hindi">Hindi</option>
+
+            <option value="Tamil">Tamil</option>
+
+        </select>
+
+
+        <!-- Image Upload -->
+        <label for="images">Upload Banana Leaf Image:</label>
+
+        <input
+            type="file"
+            id="images"
+            name="images"
+            accept="image/*"
+            multiple
+            required
+        >
+
+
+        <!-- Predict -->
+        <button type="submit">
+            🔍 Predict Disease
+        </button>
+
+    </form>
+
+
+    <div id="loading" class="loading"></div>
+
+    <div id="results"></div>
+
+
+    <!-- Previous Predictions -->
+
+    <div class="previous">
+
+        <h2>Previous Predictions</h2>
+
+        {% if previous %}
+
+            {% for item in previous %}
+
+            <div class="previous-card">
+
+                <img src="/{{ item.image }}" alt="Banana Leaf">
+
+                <p>
+                    <strong>Disease:</strong>
+                    {{ item.disease }}
+                </p>
+
+                <p>
+                    <strong>Confidence:</strong>
+                    {{ item.confidence }}%
+                </p>
+
+                <p>
+                    <strong>Language:</strong>
+                    {{ item.language }}
+                </p>
+
+                <p>
+                    <strong>Advice:</strong>
+                    {{ item.advice }}
+                </p>
+
+                <p>
+                    <strong>Fertilizer:</strong>
+                    {{ item.fertilizer }}
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No previous predictions yet.</p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<script>
+
+const form = document.getElementById("predictionForm");
+
+const resultsDiv = document.getElementById("results");
+
+const loadingDiv = document.getElementById("loading");
+
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    resultsDiv.innerHTML = "";
+
+    loadingDiv.innerHTML = "🔄 Predicting... Please wait.";
+
+
+    const formData = new FormData(form);
+
+
+    try {
+
+        const response = await fetch("/predict", {
+
+            method: "POST",
+
+            body: formData
+
+        });
+
+
+        const data = await response.json();
+
+
+        loadingDiv.innerHTML = "";
+
+
+        if (!data.results || data.results.length === 0) {
+
+            resultsDiv.innerHTML =
+                "<p>No prediction result found.</p>";
+
+            return;
+
+        }
+
+
+        data.results.forEach(function(result) {
+
+            const card = document.createElement("div");
+
+            card.className = "result-card";
+
+
+            card.innerHTML = `
+
+                <h2>Prediction Result</h2>
+
+                <img src="/${result.image}" alt="Banana Leaf">
+
+                <p>
+                    <strong>Predicted Disease:</strong>
+                    ${result.disease}
+                </p>
+
+                <p>
+                    <strong>Confidence:</strong>
+                    ${result.confidence}%
+                </p>
+
+                <p>
+                    <strong>Advice:</strong>
+                    ${result.advice.join(", ")}
+                </p>
+
+                <p>
+                    <strong>Fertilizer:</strong>
+                    ${result.fertilizer.join(", ")}
+                </p>
+
+            `;
+
+
+            resultsDiv.appendChild(card);
+
+        });
+
+    }
+
+    catch (error) {
+
+        loadingDiv.innerHTML = "";
+
+        resultsDiv.innerHTML =
+            "<p style='color:red;'>Error while predicting. Please try again.</p>";
+
+        console.error(error);
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

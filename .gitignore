@@ -1,0 +1,8 @@
+dataset/ 
+uploads/ 
+*.jpg 
+*.jpeg 
+*.png 
+*.h5 
+results.xlsx
+dataset.zip
