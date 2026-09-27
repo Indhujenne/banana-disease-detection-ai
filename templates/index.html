@@ -1,13 +1,17 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Banana Disease Predictor</title>
 
     <style>
+
         body {
             font-family: Arial, sans-serif;
             background: #f4f8f2;
@@ -74,8 +78,9 @@
             border: 1px solid #c5e1a5;
         }
 
-        .result-card h2 {
-            margin-top: 0;
+        .not-banana {
+            background: #fff3e0;
+            border: 1px solid #ffcc80;
         }
 
         .previous {
@@ -112,8 +117,11 @@
             color: #2e7d32;
             font-weight: bold;
         }
+
     </style>
+
 </head>
+
 
 <body>
 
@@ -121,9 +129,18 @@
 
     <h1>🍌 Banana Disease Predictor</h1>
 
+
+    <!-- =====================================================
+         PREDICTION FORM
+         ===================================================== -->
+
     <form id="predictionForm">
 
-        <label for="disease">Select Disease:</label>
+
+        <label for="disease">
+            Select Disease:
+        </label>
+
 
         <select id="disease" name="disease">
 
@@ -150,31 +167,44 @@
         </select>
 
 
-        <label for="language">Select Language:</label>
+        <label for="language">
+            Select Language:
+        </label>
+
 
         <select id="language" name="language">
 
-            <option value="English">English</option>
+            <option value="English">
+                English
+            </option>
 
-            <option value="Telugu">Telugu</option>
+            <option value="Telugu">
+                Telugu
+            </option>
 
-            <option value="Hindi">Hindi</option>
+            <option value="Hindi">
+                Hindi
+            </option>
 
-            <option value="Tamil">Tamil</option>
+            <option value="Tamil">
+                Tamil
+            </option>
 
         </select>
 
 
-        <label for="images">
+        <label for="file">
             Upload Banana Leaf Image:
         </label>
 
+
+        <!-- IMPORTANT: Flask expects "file" -->
+
         <input
             type="file"
-            id="images"
-            name="images"
+            id="file"
+            name="file"
             accept="image/*"
-            multiple
             required
         >
 
@@ -183,70 +213,111 @@
             🔍 Predict Disease
         </button>
 
+
     </form>
 
 
+    <!-- =====================================================
+         LOADING
+         ===================================================== -->
+
     <div id="loading" class="loading"></div>
+
+
+    <!-- =====================================================
+         CURRENT RESULT
+         ===================================================== -->
 
     <div id="results"></div>
 
+
+    <!-- =====================================================
+         PREVIOUS PREDICTIONS
+         ===================================================== -->
 
     <div class="previous">
 
         <h2>Previous Predictions</h2>
 
+
         {% if previous %}
+
 
             {% for item in previous %}
 
+
             <div class="previous-card">
+
 
                 <img
                     src="{{ url_for('static', filename=item.image) }}"
-                    alt="Banana Leaf"
+                    alt="Uploaded Image"
                 >
 
+
                 <p>
-                    <strong>Disease:</strong>
+                    <strong>Prediction:</strong>
                     {{ item.disease }}
                 </p>
+
 
                 <p>
                     <strong>Confidence:</strong>
                     {{ item.confidence }}%
                 </p>
 
+
                 <p>
                     <strong>Language:</strong>
                     {{ item.language }}
                 </p>
+
+
+                <p>
+                    <strong>Date:</strong>
+                    {{ item.date }}
+                </p>
+
 
                 <p>
                     <strong>Advice:</strong>
                     {{ item.advice }}
                 </p>
 
+
                 <p>
                     <strong>Fertilizer:</strong>
                     {{ item.fertilizer }}
                 </p>
 
+
             </div>
+
 
             {% endfor %}
 
+
         {% else %}
+
 
             <p>No previous predictions yet.</p>
 
+
         {% endif %}
 
+
     </div>
+
 
 </div>
 
 
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
 <script>
+
 
 const form = document.getElementById("predictionForm");
 
@@ -257,9 +328,12 @@ const loadingDiv = document.getElementById("loading");
 
 form.addEventListener("submit", async function(event) {
 
+
     event.preventDefault();
 
+
     resultsDiv.innerHTML = "";
+
 
     loadingDiv.innerHTML =
         "🔄 Predicting... Please wait.";
@@ -269,6 +343,7 @@ form.addEventListener("submit", async function(event) {
 
 
     try {
+
 
         const response = await fetch("/predict", {
 
@@ -287,87 +362,133 @@ form.addEventListener("submit", async function(event) {
 
         if (!response.ok) {
 
+
             resultsDiv.innerHTML =
+
                 `<p class="error">
                     ${data.error || "Prediction failed."}
                 </p>`;
 
+
             return;
+
         }
 
 
-        if (!data.results || data.results.length === 0) {
+        const card = document.createElement("div");
 
-            resultsDiv.innerHTML =
-                "<p class='error'>No prediction result found.</p>";
 
-            return;
+        if (data.class === "not_banana_leaf") {
+
+            card.className =
+                "result-card not-banana";
+
+        } else {
+
+            card.className =
+                "result-card";
+
         }
 
 
-        data.results.forEach(function(result) {
+        card.innerHTML = `
 
-            const card = document.createElement("div");
+            <h2>
 
-            card.className = "result-card";
+                ${
+                    data.class === "not_banana_leaf"
+                    ? "⚠️ Not a Banana Leaf"
+                    : "✅ Prediction Result"
+                }
 
-
-            card.innerHTML = `
-
-                <h2>✅ Prediction Result</h2>
-
-                <img
-                    src="/static/${result.image}"
-                    alt="Banana Leaf"
-                >
-
-                <p>
-                    <strong>Predicted Disease:</strong>
-                    ${result.disease}
-                </p>
-
-                <p>
-                    <strong>Confidence:</strong>
-                    ${result.confidence}%
-                </p>
-
-                <p>
-                    <strong>Advice:</strong>
-                    ${result.advice}
-                </p>
-
-                <p>
-                    <strong>Fertilizer:</strong>
-                    ${result.fertilizer}
-                </p>
-
-            `;
+            </h2>
 
 
-            resultsDiv.appendChild(card);
+            <img
+                src="/static/${data.image}"
+                alt="Uploaded Image"
+            >
 
-        });
+
+            <p>
+
+                <strong>Prediction:</strong>
+
+                ${data.prediction}
+
+            </p>
+
+
+            <p>
+
+                <strong>Confidence:</strong>
+
+                ${data.confidence}%
+
+            </p>
+
+
+            <p>
+
+                <strong>Advice:</strong>
+
+                ${data.advice}
+
+            </p>
+
+
+            <p>
+
+                <strong>Fertilizer:</strong>
+
+                ${data.fertilizer}
+
+            </p>
+
+        `;
+
+
+        resultsDiv.appendChild(card);
 
 
         loadingDiv.innerHTML =
-            "<span class='success'>✅ Prediction completed successfully.</span>";
+
+            "<span class='success'>" +
+            "✅ Prediction completed successfully." +
+            "</span>";
+
 
     }
+
 
     catch (error) {
 
+
         loadingDiv.innerHTML = "";
 
-        resultsDiv.innerHTML =
-            "<p class='error'>Error while predicting. Please try again.</p>";
 
-        console.error("Prediction error:", error);
+        resultsDiv.innerHTML =
+
+            "<p class='error'>" +
+            "Error while predicting. Please try again." +
+            "</p>";
+
+
+        console.error(
+            "Prediction error:",
+            error
+        );
 
     }
 
+
 });
+
 
 </script>
 
+
 </body>
+
 </html>
+```
