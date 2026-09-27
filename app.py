@@ -31,7 +31,10 @@ MODEL_FILE = hf_hub_download(
 print("Model downloaded successfully!")
 print("Loading ResNet50 model...")
 
-model = tf.keras.models.load_model(MODEL_FILE)
+model = tf.keras.models.load_model(
+    MODEL_FILE,
+    compile=False
+)
 
 print("Model loaded successfully!")
 
